@@ -22,13 +22,12 @@
                 <label for="language" class="visually-hidden">Sprache wählen</label>
                 <select id="language" onchange="changeLanguage(this.value);">
                     <option value="../index.html">Deutsch 🇩🇪</option>
-                    <option value="tr.html">Türkçe 🇹🇷</option>
-                    <option value="ar.html">العربية 🇸🇦</option>
-                    <option value="ru.html">Русский 🇷🇺</option>
                     <option value="en.html">English 🇬🇧</option>
+                    <option value="tr.html">Türkçe 🇹🇷</option>
+                    <option value="ru.html">Русский 🇷🇺</option>
+                    <option value="ar.html">العربية 🇸🇦</option>
+                    <option value="einfach.html">Einfache Sprache 🔤</option>
                 </select>
-                <a href="einfach.html" class="simple-language-btn" aria-label="Einfache Sprache"
-                aria-current="page">Einfache Sprache</a>
             </div>
         </header>
         <nav role="navigation" aria-label="Hauptnavigation">
@@ -187,52 +186,20 @@
     </script>
     <!-- Language Switching Script -->
     <script>
-        // Language Configuration
-        const languageConfig = {
-            defaultLanguage: 'de',
-            availableLanguages: {
-                'de': { name: 'Deutsch', flag: '🇩🇪', file: '../index.html' },
-                'en': { name: 'English', flag: '🇬🇧', file: 'en.html' },
-                'tr': { name: 'Türkçe', flag: '🇹🇷', file: 'tr.html' },
-                'ru': { name: 'Русский', flag: '🇷🇺', file: 'ru.html' },
-                'ar': { name: 'العربية', flag: '🇸🇦', file: 'ar.html' },
-                'einfach': { name: 'Einfache Sprache', file: 'einfach.html' }
-            }
-        };
-
         function changeLanguage(targetUrl) {
-            // Save language preference in localStorage
-            const languageCode = targetUrl.split('/').pop().replace('.html', '') || 'de';
-            localStorage.setItem('preferredLanguage', languageCode);
-
-            // Redirect to the selected language page
             window.location.href = targetUrl;
         }
-
-        // Auto-select current language on page load
         document.addEventListener('DOMContentLoaded', () => {
-            const currentPath = window.location.pathname;
             const languageSelect = document.getElementById('language');
-
-            // Find matching option and set it as selected
+            if (!languageSelect) return;
+            const currentPath = window.location.pathname;
             for (let option of languageSelect.options) {
-                if (currentPath.endsWith(option.value)) {
+                if (currentPath.endsWith(option.value) || currentPath.endsWith('/' + option.value)) {
                     option.selected = true;
                     break;
                 }
-            }
-
-            // Check for saved language preference
-            const savedLanguage = localStorage.getItem('preferredLanguage');
-            if (savedLanguage && savedLanguage !== 'de' && savedLanguage !== 'einfach') {
-                const targetOption = Array.from(languageSelect.options)
-                    .find(option => {
-                        const optionLang = option.value.split('/').pop().replace('.html', '');
-                        return optionLang === savedLanguage;
-                    });
-
-                if (targetOption && !currentPath.endsWith(targetOption.value)) {
-                    changeLanguage(targetOption.value);
+                if (option.value.includes('einfach') && currentPath.includes('einfach.html')) {
+                    option.selected = true;
                 }
             }
         });

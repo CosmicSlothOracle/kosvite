@@ -387,13 +387,12 @@
                 <label for="language" class="visually-hidden" data-translate="language-label">Sprache wählen</label>
                 <select id="language" onchange="changeLanguage(this.value);">
                     <option value="index.html">Deutsch 🇩🇪</option>
-                    <option value="lang/tr.html">Turkish 🇹🇷</option>
-                    <option value="lang/ar.html">العربية 🇸🇦</option>
+                    <option value="lang/en.html">English 🇬🇧</option>
+                    <option value="lang/tr.html">Türkçe 🇹🇷</option>
                     <option value="lang/ru.html">Русский 🇷🇺</option>
-                    <option selected="selected" value="lang/en.html">English 🇬🇧</option>
+                    <option value="lang/ar.html">العربية 🇸🇦</option>
+                    <option value="lang/einfach.html">Einfache Sprache 🔤</option>
                 </select>
-                <a aria-label="Einfache Sprache" class="simple-language-btn" href="lang/einfach.html">Simple
-                    language</a>
             </div>
         </header>
         <!-- Desktop Navigation -->
@@ -1472,6 +1471,25 @@
             // Force reload banners from localStorage
             loadBanners();
         });
+    </script>
+    <script>
+    function changeLanguage(targetUrl) {
+      window.location.href = targetUrl;
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      const languageSelect = document.getElementById('language');
+      if (!languageSelect) return;
+      const currentPath = window.location.pathname;
+      for (let option of languageSelect.options) {
+        if (currentPath.endsWith(option.value) || currentPath.endsWith('/' + option.value)) {
+          option.selected = true;
+          break;
+        }
+        if (option.value.includes('einfach') && currentPath.includes('einfach.html')) {
+          option.selected = true;
+        }
+      }
+    });
     </script>
 </body>
 

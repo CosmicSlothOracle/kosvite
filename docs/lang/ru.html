@@ -31,13 +31,13 @@ HTML
             <div class="language-controls">
                 <label class="visually-hidden" for="language">Выберите язык</label>
                 <select id="language" onchange="changeLanguage(this.value);">
-                    <option value="index.html">Deutsch 🇩🇪</option>
-                    <option value="lang/tr.html">Турецкий 🇹🇷</option>
-                    <option value="lang/ar.html">العربية 🇸🇦</option>
-                    <option selected="selected" value="lang/ru.html">Русский 🇷🇺</option>
-                    <option value="lang/en.html">Английский 🇬🇧</option>
+                    <option value="../index.html">Deutsch 🇩🇪</option>
+                    <option value="en.html">English 🇬🇧</option>
+                    <option value="tr.html">Türkçe 🇹🇷</option>
+                    <option value="ru.html">Русский 🇷🇺</option>
+                    <option value="ar.html">العربية 🇸🇦</option>
+                    <option value="einfach.html">Einfache Sprache 🔤</option>
                 </select>
-                <a aria-label="Einfache Sprache" class="simple-language-btn" href="lang/einfach.html">Простой язык</a>
             </div>
         </header>
         <nav aria-label="Hauptnavigation" role="navigation">
@@ -209,45 +209,22 @@ HTML
     </script>
     Языковой переключение скрипта
     <script>
-        // Language Configuration
-        const languageConfig = {
-            'de': '/index.html',
-            'en': '/lang/en.html',
-            'tr': '/lang/tr.html',
-            'ru': '/lang/ru.html',
-            'ar': '/lang/ar.html'
-        };
-
-        function changeLanguage(targetLang) {
-            // Get the target URL from the configuration
-            const targetUrl = languageConfig[targetLang];
-
-            if (targetUrl) {
-                // Save language preference
-                localStorage.setItem('preferredLanguage', targetLang);
-
-                // Redirect to the selected language page
-                window.location.href = targetUrl;
-            }
+        function changeLanguage(targetUrl) {
+            window.location.href = targetUrl;
         }
-
-        // On page load, check for saved language preference
         document.addEventListener('DOMContentLoaded', () => {
-            const savedLanguage = localStorage.getItem('preferredLanguage');
             const languageSelect = document.getElementById('language');
-
-            // Set the dropdown to the saved or current language
-            if (savedLanguage) {
-                languageSelect.value = savedLanguage;
-            } else {
-                // Default to German if no preference saved
-                languageSelect.value = 'de';
+            if (!languageSelect) return;
+            const currentPath = window.location.pathname;
+            for (let option of languageSelect.options) {
+                if (currentPath.endsWith(option.value) || currentPath.endsWith('/' + option.value)) {
+                    option.selected = true;
+                    break;
+                }
+                if (option.value.includes('einfach') && currentPath.includes('einfach.html')) {
+                    option.selected = true;
+                }
             }
-
-            // Add event listener to language select
-            languageSelect.addEventListener('change', (event) => {
-                changeLanguage(event.target.value);
-            });
         });
     </script>
 </body>
