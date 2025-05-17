@@ -31,13 +31,13 @@ HTML
             <div class="language-controls">
                 <label class="visually-hidden" for="language">Выберите язык</label>
                 <select id="language" onchange="changeLanguage(this.value);">
-                    <option value="../index.html">Deutsch 🇩🇪</option>
-                    <option value="en.html">English 🇬🇧</option>
-                    <option value="tr.html">Türkçe 🇹🇷</option>
-                    <option value="ru.html">Русский 🇷🇺</option>
-                    <option value="ar.html">العربية 🇸🇦</option>
-                    <option value="einfach.html">Einfache Sprache 🔤</option>
+                    <option value="index.html">Deutsch 🇩🇪</option>
+                    <option value="lang/tr.html">Турецкий 🇹🇷</option>
+                    <option value="lang/ar.html">العربية 🇸🇦</option>
+                    <option selected="selected" value="lang/ru.html">Русский 🇷🇺</option>
+                    <option value="lang/en.html">Английский 🇬🇧</option>
                 </select>
+                <a aria-label="Einfache Sprache" class="simple-language-btn" href="lang/einfach.html">Простой язык</a>
             </div>
         </header>
         <nav aria-label="Hauptnavigation" role="navigation">
@@ -120,15 +120,6 @@ HTML
                     комнат для семинаров и групп). Наша работа в настоящее время сосредоточена на создании первых
                     предложений по снабжению в Лихтенберге, но в перспективе мы хотим донести концепцию районного
                     медицинского центра во все районы Берлина, в которых жители могут быть особенно укреплены.</p>
-            </section>
-            <section id="programm">
-                <div class="section-title-container">
-                    <h2>Programm</h2>
-                </div>
-                <div class="event-images" style="display: flex; flex-wrap: wrap; gap: 24px; justify-content: center; align-items: flex-start; margin-bottom: 32px;">
-                    <img src="https://link.storjshare.io/raw/jxwpeplx3yxtkyeltknei6yn5dtq/geko/event0.png" alt="Programm Event 0" style="max-width: 480px; width: 100%; height: auto; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);" />
-                    <img src="https://link.storjshare.io/raw/jx4klht7crd5x7grus4gnsz4s7fa/geko/event2.jpg" alt="Programm Event 1" style="max-width: 480px; width: 100%; height: auto; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);" />
-                </div>
             </section>
             <section id="events">
                 <h2>События</h2>
@@ -218,22 +209,45 @@ HTML
     </script>
     Языковой переключение скрипта
     <script>
-        function changeLanguage(targetUrl) {
-            window.location.href = targetUrl;
-        }
-        document.addEventListener('DOMContentLoaded', () => {
-            const languageSelect = document.getElementById('language');
-            if (!languageSelect) return;
-            const currentPath = window.location.pathname;
-            for (let option of languageSelect.options) {
-                if (currentPath.endsWith(option.value) || currentPath.endsWith('/' + option.value)) {
-                    option.selected = true;
-                    break;
-                }
-                if (option.value.includes('einfach') && currentPath.includes('einfach.html')) {
-                    option.selected = true;
-                }
+        // Language Configuration
+        const languageConfig = {
+            'de': '/index.html',
+            'en': '/lang/en.html',
+            'tr': '/lang/tr.html',
+            'ru': '/lang/ru.html',
+            'ar': '/lang/ar.html'
+        };
+
+        function changeLanguage(targetLang) {
+            // Get the target URL from the configuration
+            const targetUrl = languageConfig[targetLang];
+
+            if (targetUrl) {
+                // Save language preference
+                localStorage.setItem('preferredLanguage', targetLang);
+
+                // Redirect to the selected language page
+                window.location.href = targetUrl;
             }
+        }
+
+        // On page load, check for saved language preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedLanguage = localStorage.getItem('preferredLanguage');
+            const languageSelect = document.getElementById('language');
+
+            // Set the dropdown to the saved or current language
+            if (savedLanguage) {
+                languageSelect.value = savedLanguage;
+            } else {
+                // Default to German if no preference saved
+                languageSelect.value = 'de';
+            }
+
+            // Add event listener to language select
+            languageSelect.addEventListener('change', (event) => {
+                changeLanguage(event.target.value);
+            });
         });
     </script>
 </body>

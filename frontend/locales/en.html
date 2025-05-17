@@ -31,13 +31,14 @@ html
             <div class="language-controls">
                 <label class="visually-hidden" for="language">Choose language</label>
                 <select id="language" onchange="changeLanguage(this.value);">
-                    <option value="../index.html">Deutsch 🇩🇪</option>
-                    <option value="en.html">English 🇬🇧</option>
-                    <option value="tr.html">Türkçe 🇹🇷</option>
-                    <option value="ru.html">Русский 🇷🇺</option>
-                    <option value="ar.html">العربية 🇸🇦</option>
-                    <option value="einfach.html">Einfache Sprache 🔤</option>
+                    <option value="index.html">Deutsch 🇩🇪</option>
+                    <option value="lang/tr.html">Turkish 🇹🇷</option>
+                    <option value="lang/ar.html">العربية 🇸🇦</option>
+                    <option value="lang/ru.html">Русский 🇷🇺</option>
+                    <option selected="selected" value="lang/en.html">English 🇬🇧</option>
                 </select>
+                <a aria-label="Einfache Sprache" class="simple-language-btn" href="lang/einfach.html">Simple
+                    language</a>
             </div>
         </header>
         <nav aria-label="Hauptnavigation" role="navigation">
@@ -162,14 +163,31 @@ html
                 <img class="section-arrow"
                 src="https://link.storjshare.io/raw/jx4zolve64kgmj27jdwq3fh4otka/geko/arrow.png" alt="Arrow">
             </section>
-            <section id="programm">
+            <section id="banners">
                 <div class="section-title-container">
-                    <h2>Programm</h2>
+                    <h2>Our Banners</h2>
                 </div>
-                <div class="event-images" style="display: flex; flex-wrap: wrap; gap: 24px; justify-content: center; align-items: flex-start; margin-bottom: 32px;">
-                    <img src="https://link.storjshare.io/raw/jxwpeplx3yxtkyeltknei6yn5dtq/geko/event0.png" alt="Programm Event 0" style="max-width: 480px; width: 100%; height: auto; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);" />
-                    <img src="https://link.storjshare.io/raw/jx4klht7crd5x7grus4gnsz4s7fa/geko/event2.jpg" alt="Programm Event 1" style="max-width: 480px; width: 100%; height: auto; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);" />
+                <h2 data-translate="banners-title">Our Banners</h2>
+                <div class="banner-grid">
+                    <div class="banner">
+                        <img src="https://i.postimg.cc/vTW9F8fC/platzhalter.png" alt="Banner 1" id="banner1">
+                        <button class="edit-banner-btn" data-banner="1">Edit</button>
+                    </div>
+                    <div class="banner">
+                        <img src="https://i.postimg.cc/vTW9F8fC/platzhalter.png" alt="Banner 2" id="banner2">
+                        <button class="edit-banner-btn" data-banner="2">Edit</button>
+                    </div>
+                    <div class="banner">
+                        <img src="https://i.postimg.cc/vTW9F8fC/platzhalter.png" alt="Banner 3" id="banner3">
+                        <button class="edit-banner-btn" data-banner="3">Edit</button>
+                    </div>
+                    <div class="banner">
+                        <img src="https://i.postimg.cc/vTW9F8fC/platzhalter.png" alt="Banner 4" id="banner4">
+                        <button class="edit-banner-btn" data-banner="4">Edit</button>
+                    </div>
                 </div>
+                <img class="section-arrow"
+                src="https://link.storjshare.io/raw/jx4zolve64kgmj27jdwq3fh4otka/geko/arrow.png" alt="Arrow">
             </section>
             <section id="join">
                 <div class="section-title-container">
@@ -248,22 +266,45 @@ html
     </script>
     Language Switching Script
     <script>
-        function changeLanguage(targetUrl) {
-            window.location.href = targetUrl;
-        }
-        document.addEventListener('DOMContentLoaded', () => {
-            const languageSelect = document.getElementById('language');
-            if (!languageSelect) return;
-            const currentPath = window.location.pathname;
-            for (let option of languageSelect.options) {
-                if (currentPath.endsWith(option.value) || currentPath.endsWith('/' + option.value)) {
-                    option.selected = true;
-                    break;
-                }
-                if (option.value.includes('einfach') && currentPath.includes('einfach.html')) {
-                    option.selected = true;
-                }
+        // Language Configuration
+        const languageConfig = {
+            'de': '/index.html',
+            'en': '/lang/en.html',
+            'tr': '/lang/tr.html',
+            'ru': '/lang/ru.html',
+            'ar': '/lang/ar.html'
+        };
+
+        function changeLanguage(targetLang) {
+            // Get the target URL from the configuration
+            const targetUrl = languageConfig[targetLang];
+
+            if (targetUrl) {
+                // Save language preference
+                localStorage.setItem('preferredLanguage', targetLang);
+
+                // Redirect to the selected language page
+                window.location.href = targetUrl;
             }
+        }
+
+        // On page load, check for saved language preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedLanguage = localStorage.getItem('preferredLanguage');
+            const languageSelect = document.getElementById('language');
+
+            // Set the dropdown to the saved or current language
+            if (savedLanguage) {
+                languageSelect.value = savedLanguage;
+            } else {
+                // Default to German if no preference saved
+                languageSelect.value = 'de';
+            }
+
+            // Add event listener to language select
+            languageSelect.addEventListener('change', (event) => {
+                changeLanguage(event.target.value);
+            });
         });
     </script>
 </body>
