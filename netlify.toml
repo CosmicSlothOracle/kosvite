@@ -1,0 +1,8 @@
+[build]
+  command = "python scripts/generate_chatbot_key.py && python scripts/inject_chatbot_script.py"
+  publish = "docs"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
