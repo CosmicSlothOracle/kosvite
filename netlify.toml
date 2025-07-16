@@ -1,0 +1,11 @@
+[build]
+  command = "python scripts/generate_chatbot_key.py && python scripts/inject_chatbot_script.py"
+  publish = "docs"
+
+[build.environment]
+  GROQ_API_KEY = "your-groq-api-key-here"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
