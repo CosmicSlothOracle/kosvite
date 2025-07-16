@@ -6,3 +6,8 @@
   from = "/*"
   to = "/index.html"
   status = 200
+
+[build.environment]
+  # Disable secret scanning for the Groq API key written to the chatbotKey.js file
+  SECRETS_SCAN_OMIT_KEYS = "GROQ_API_KEY"  # allow this env var to appear in build output
+  # Alternatively you could disable scanning entirely with SECRETS_SCAN_ENABLED = "false"
