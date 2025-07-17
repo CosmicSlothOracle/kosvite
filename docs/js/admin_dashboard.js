@@ -102,9 +102,11 @@
     const file = bannerFileInput.files[0];
     if (!file) return alert("Choose an image first.");
     uploadBannerBtn.disabled = true;
-    try {
-      const reader = new FileReader();
-      reader.onload = async () => {
+
+    const reader = new FileReader();
+
+    reader.onload = async () => {
+      try {
         const base64 = reader.result.split(",")[1];
         await api("/api/banners", {
           method: "POST",
@@ -112,13 +114,19 @@
         });
         bannerFileInput.value = "";
         await loadBanners();
-      };
-      reader.readAsDataURL(file);
-    } catch (err) {
-      alert(err.message);
-    } finally {
+      } catch (err) {
+        alert(err.message);
+      } finally {
+        uploadBannerBtn.disabled = false;
+      }
+    };
+
+    reader.onerror = () => {
+      alert("Failed to read file.");
       uploadBannerBtn.disabled = false;
-    }
+    };
+
+    reader.readAsDataURL(file);
   }
 
   async function loadParticipants() {
