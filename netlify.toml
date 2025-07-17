@@ -1,7 +1,30 @@
 [build]
-  command = "python scripts/generate_chatbot_key.py && python scripts/inject_chatbot_script.py"
+  command = "npm --prefix netlify/functions install && python scripts/generate_chatbot_key.py && python scripts/inject_chatbot_script.py"
   publish = "docs"
 
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+[[redirects]]
+  from = "/api/login"
+  to = "/.netlify/functions/login"
+  status = 200
+[[redirects]]
+  from = "/api/participants"
+  to = "/.netlify/functions/participants"
+  status = 200
+[[redirects]]
+  from = "/api/banners/*"
+  to = "/.netlify/functions/banners/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/api/banners"
+  to = "/.netlify/functions/banners"
+  status = 200
+
+# Keep SPA redirect last
 [[redirects]]
   from = "/*"
   to = "/index.html"

@@ -1,8 +1,11 @@
+from functools import wraps
 from flask import Flask, jsonify, request, send_from_directory, make_response, redirect
 from flask_cors import CORS
 import bcrypt
 import os
 import json
+import jwt
+from datetime import datetime, timedelta
 from werkzeug.utils import secure_filename
 from cms import ContentManager
 import logging
@@ -67,12 +70,67 @@ if os.path.exists(PARTICIPANTS_FILE):
 else:
     logger.warning('Participants file does not exist')
 
-# Dummy-User (später DB)
-DUMMY_USER = {
-    'username': 'admin',
-    # Passwort: 'kosge2024!' (bcrypt-hash)
-    'password_hash': b'$2b$12$ZCgWXzUdmVX.PnIfj4oeJOkX69Tu1rVZ51zGYe3kSloANnwMaTlBW'
-}
+# Admin credentials are now loaded from environment variables so they can be
+# changed without modifying the source code.
+#
+# To set them locally, create a `.env` file (see `.env.example`) or define
+# system environment variables:
+#   ADMIN_USERNAME=<your-user>
+#   ADMIN_PASSWORD_HASH=<bcrypt-hash>  ─ use `python -c "import bcrypt,sys; print(bcrypt.hashpw(b'NEWPASS', bcrypt.gensalt()).decode())"`
+#
+# If not set, sensible defaults are used (matching the previous hard-coded user).
+
+
+ADMIN_USERNAME: str = os.environ.get('ADMIN_USERNAME', 'admin')
+
+# Stored as string in env → convert to bytes for bcrypt
+_default_pw_hash = '$2b$12$ZCgWXzUdmVX.PnIfj4oeJOkX69Tu1rVZ51zGYe3kSloANnwMaTlBW'
+ADMIN_PASSWORD_HASH: bytes = os.environ.get(
+    'ADMIN_PASSWORD_HASH', _default_pw_hash).encode('utf-8')
+
+# JWT configuration
+JWT_SECRET: str = os.environ.get('JWT_SECRET', 'change_me')
+JWT_ALGO = 'HS256'
+JWT_EXP_HOURS = 8
+
+
+def generate_token(username: str) -> str:
+    """Return a signed JWT token."""
+    payload = {
+        'sub': username,
+        'exp': datetime.utcnow() + timedelta(hours=JWT_EXP_HOURS),
+        'iat': datetime.utcnow()
+    }
+    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGO)
+
+
+def verify_token(token: str):
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGO])
+        return payload.get('sub')
+    except jwt.ExpiredSignatureError:
+        return None
+    except jwt.InvalidTokenError:
+        return None
+
+
+def auth_required(f):
+    """Decorator to protect endpoints with JWT token in Authorization header."""
+
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth_header = request.headers.get('Authorization', '')
+        if not auth_header.startswith('Bearer '):
+            return jsonify({'error': 'Missing or invalid Authorization header'}), 401
+        token = auth_header[7:]
+        user = verify_token(token)
+        if not user:
+            return jsonify({'error': 'Invalid or expired token'}), 401
+        # You could attach user to request context here if needed
+        return f(*args, **kwargs)
+
+    return decorated
+
 
 ALLOWED_EXTENSIONS = {'png'}
 
@@ -151,13 +209,16 @@ def login():
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
-    if username == DUMMY_USER['username'] and bcrypt.checkpw(password.encode(), DUMMY_USER['password_hash']):
-        # Dummy-Token (später JWT)
-        return jsonify({'token': 'dummy-token', 'user': username}), 200
+    if username == ADMIN_USERNAME and bcrypt.checkpw(password.encode(), ADMIN_PASSWORD_HASH):
+        return jsonify({'token': generate_token(username), 'user': username}), 200
     return jsonify({'error': 'Invalid credentials'}), 401
 
 
+# -------------------- Banner endpoints --------------------
+
+
 @app.route('/api/banners', methods=['POST'])
+@auth_required
 def upload_banner():
     if 'file' not in request.files:
         logger.error('No file part in request')
@@ -189,6 +250,7 @@ def upload_banner():
 
 
 @app.route('/api/banners', methods=['GET'])
+@auth_required
 def list_banners():
     files = [f for f in os.listdir(UPLOAD_FOLDER) if allowed_file(f)]
     urls = [f'/api/uploads/{f}' for f in files]
@@ -196,6 +258,7 @@ def list_banners():
 
 
 @app.route('/api/banners/<filename>', methods=['DELETE'])
+@auth_required
 def delete_banner(filename):
     filename = secure_filename(filename)
     file_path = os.path.join(UPLOAD_FOLDER, filename)
@@ -260,6 +323,7 @@ def add_participant():
 
 
 @app.route('/api/participants', methods=['GET'])
+@auth_required
 def get_participants():
     try:
         participants = load_participants()
@@ -296,6 +360,7 @@ def get_content(section):
 
 
 @app.route('/api/cms/content/<section>', methods=['POST'])
+@auth_required
 def create_content(section):
     data = request.get_json()
     title = data.get('title')
@@ -312,6 +377,7 @@ def create_content(section):
 
 
 @app.route('/api/cms/content/<section>', methods=['PUT'])
+@auth_required
 def update_content(section):
     data = request.get_json()
     content = data.get('content')
@@ -329,6 +395,7 @@ def update_content(section):
 
 
 @app.route('/api/cms/content/<section>/translate/<target_language>', methods=['POST'])
+@auth_required
 def translate_content(section, target_language):
     success = content_manager.translate_content(section, target_language)
     if success:
@@ -344,6 +411,7 @@ def list_sections():
 
 
 @app.route('/api/cms/content/<section>', methods=['DELETE'])
+@auth_required
 def delete_content(section):
     language = request.args.get('language')
     success = content_manager.delete_content(section, language)
