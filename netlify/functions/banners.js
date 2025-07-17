@@ -23,7 +23,10 @@ async function uploadBanner(event, context) {
     return authed;
   }
 
-  const contentType = event.headers["content-type"] || event.headers["Content-Type"] || "";
+  let contentType = event.headers["content-type"] || event.headers["Content-Type"] || "";
+
+  // Some browsers omit the header when sending fetch(JSON-string). Treat empty as JSON.
+  if (!contentType) contentType = "application/json";
 
   // CASE 1: Frontend sends JSON with { filename, dataBase64 }
   if (contentType.includes("application/json")) {
@@ -61,11 +64,23 @@ async function uploadBanner(event, context) {
 async function serveBanner(id) {
   const blob = await store.get(id, { consistency: "strong" });
   if (!blob) return { statusCode: 404, body: "Not found" };
-  // blob is Buffer
+  // Determine correct MIME from file extension so browsers render webp/jpg correctly
+  const ext = id.split(".").pop().toLowerCase();
+  const mimeMap = {
+    png: "image/png",
+    jpg: "image/jpeg",
+    jpeg: "image/jpeg",
+    gif: "image/gif",
+    webp: "image/webp",
+    svg: "image/svg+xml",
+    avif: "image/avif",
+  };
+  const mime = mimeMap[ext] || "application/octet-stream";
+
   return {
     statusCode: 200,
     headers: {
-      "Content-Type": "image/png",
+      "Content-Type": mime,
       "Cache-Control": "public, max-age=31536000, immutable",
     },
     isBase64Encoded: true,
