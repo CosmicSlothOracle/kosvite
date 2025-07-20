@@ -11,7 +11,7 @@ collections:
     files:
       - label: "Startseitenbild"
         name: "homepage"
-        file: "docs/public/data/homepage.yml"
+        file: "docs/data/homepage.yml"
         fields:
           - { label: "Titel", name: "title", widget: "string" }
           - {
