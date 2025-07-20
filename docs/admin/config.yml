@@ -1,0 +1,28 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "docs/public/uploads"
+public_folder: "/uploads"
+
+collections:
+  - name: "imagesConfig"
+    label: "Bilder"
+    files:
+      - label: "Startseitenbild"
+        name: "homepage"
+        file: "docs/public/data/homepage.yml"
+        fields:
+          - { label: "Titel", name: "title", widget: "string" }
+          - {
+              label: "Bild-URL",
+              name: "imageUrl",
+              widget: "string",
+              required: false,
+            }
+          - {
+              label: "Upload",
+              name: "uploadImage",
+              widget: "image",
+              required: false,
+            }

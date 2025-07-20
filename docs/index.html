@@ -1187,6 +1187,49 @@
       }
     });
     </script>
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+    <script>
+      // Initialize Netlify Identity
+      if (window.netlifyIdentity) {
+        window.netlifyIdentity.on("init", user => {
+          if (!user) {
+            window.netlifyIdentity.on("login", () => {
+              document.location.href = "/admin/";
+            });
+          }
+        });
+        window.netlifyIdentity.on("logout", () => {
+          document.location.href = "/";
+        });
+      }
+
+      async function loadHomepageConfig() {
+        try {
+          const resp = await fetch('/data/homepage.yml');
+          const text = await resp.text();
+          const cfg = jsyaml.load(text);
+          const imgSrc = cfg.uploadImage || cfg.imageUrl;
+
+          // Update logo images
+          const primaryLogo = document.querySelector('.primary-logo');
+          const secondaryLogo = document.querySelector('.secondary-logo');
+
+          if (primaryLogo && imgSrc) {
+            primaryLogo.src = imgSrc;
+          }
+
+          // Update title if it exists
+          const titleElement = document.querySelector('h1[data-translate="start-title"]');
+          if (titleElement && cfg.title) {
+            titleElement.textContent = cfg.title;
+          }
+        } catch (error) {
+          console.error('Error loading homepage config:', error);
+        }
+      }
+      document.addEventListener('DOMContentLoaded', loadHomepageConfig);
+    </script>
     <script src="/js/chatbotKey.js"></script>
     <script defer src="/js/chatbot.js"></script>
 </body>
