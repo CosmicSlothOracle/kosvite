@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KOSGE Admin Einladung</title>
+    <style>
+        body {
+            font-family: 'Montserrat', Arial, sans-serif;
+            line-height: 1.6;
+            color: #2c3e50;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #D9C2A3, #E67E22);
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+        .logo {
+            max-width: 200px;
+            margin-bottom: 20px;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .button {
+            display: inline-block;
+            background: linear-gradient(135deg, #E67E22, #8E44AD);
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+        }
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(230, 126, 34, 0.4);
+        }
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            text-align: center;
+            font-size: 14px;
+            color: #6c757d;
+        }
+        .highlight {
+            background: linear-gradient(135deg, rgba(217, 194, 163, 0.2), rgba(230, 126, 34, 0.1));
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #E67E22;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="https://link.storjshare.io/raw/jxeghfjuomgqgf536ls26sw3tazq/geko/KOSGE%202.png"
+                 alt="KOSGE Logo" class="logo">
+            <h1>Willkommen bei KOSGE!</h1>
+            <p>Kollektiv für solidarische Gesundheit e.V.</p>
+        </div>
+
+        <div class="content">
+            <h2>Sie sind eingeladen!</h2>
+
+            <p>Hallo,</p>
+
+            <p>Sie wurden eingeladen, dem <strong>KOSGE Admin-Team</strong> beizutreten. Als Administrator haben Sie Zugriff auf:</p>
+
+            <div class="highlight">
+                <ul>
+                    <li>📝 <strong>Content Management System</strong> - Inhalte bearbeiten und aktualisieren</li>
+                    <li>📊 <strong>Teilnehmer-Verwaltung</strong> - Anmeldungen einsehen und exportieren</li>
+                    <li>🖼️ <strong>Banner-Management</strong> - Bilder hochladen und verwalten</li>
+                    <li>⚙️ <strong>Website-Einstellungen</strong> - Konfiguration anpassen</li>
+                </ul>
+            </div>
+
+            <p>Klicken Sie auf den Button unten, um Ihr Konto zu aktivieren und sich anzumelden:</p>
+
+            <div style="text-align: center;">
+                <a href="{{ .SiteURL }}/admin/#invite_token={{ .Token }}" class="button">
+                    🚀 Konto aktivieren & Anmelden
+                </a>
+            </div>
+
+            <p><strong>Wichtige Hinweise:</strong></p>
+            <ul>
+                <li>Dieser Link ist nur 24 Stunden gültig</li>
+                <li>Bewahren Sie Ihre Zugangsdaten sicher auf</li>
+                <li>Bei Fragen wenden Sie sich an: info@kosge-berlin.de</li>
+            </ul>
+
+            <p>Vielen Dank für Ihr Engagement für solidarische Gesundheit in Berlin!</p>
+
+            <p>Mit freundlichen Grüßen,<br>
+            <strong>Das KOSGE Team</strong></p>
+        </div>
+
+        <div class="footer">
+            <p>© 2024 Kollektiv für solidarische Gesundheit e.V.</p>
+            <p>🌐 <a href="https://kosge-berlin.de">kosge-berlin.de</a> | 📧 info@kosge-berlin.de</p>
+        </div>
+    </div>
+</body>
+</html>
