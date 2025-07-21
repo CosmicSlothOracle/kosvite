@@ -18,13 +18,15 @@ exports.handler = async (event, context) => {
 
   if (event.httpMethod === "GET") {
     try {
-      const banners = await store.list();
+      const listing = await store.list();              // liefert Objekt
+      const urls = listing.blobs.map(b => b.url);      // Array der URLs
       return {
         statusCode: 200,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ banners: banners.map(b => b.url) })
+        body: JSON.stringify({ banners: urls })
       };
     } catch (error) {
+      console.error(error);
       return {
         statusCode: 500,
         headers: { "Content-Type": "application/json" },

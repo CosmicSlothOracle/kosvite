@@ -16,24 +16,19 @@ exports.handler = async (event, context) => {
     }
 
     try {
-      const participants = await store.list();
-      const participantData = [];
-
-      for await (const page of participants) {
-        for (const blob of page.blobs) {
-          const data = await store.get(blob.key);
-          if (data) {
-            participantData.push(JSON.parse(data.toString()));
-          }
-        }
+      const listing = await store.list();
+      const participants = [];
+      for (const blob of listing.blobs) {
+        const raw = await store.get(blob.key);
+        if (raw) participants.push(JSON.parse(raw.toString()));
       }
-
       return {
         statusCode: 200,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ participants: participantData })
+        body: JSON.stringify({ participants })
       };
     } catch (error) {
+      console.error(error);
       return {
         statusCode: 500,
         headers: { "Content-Type": "application/json" },
