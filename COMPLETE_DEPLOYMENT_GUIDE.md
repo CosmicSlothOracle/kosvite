@@ -147,7 +147,6 @@ Enter admin password: [enter your secure password]
 
 ADMIN_USERNAME=administroni
 ADMIN_PASSWORD_HASH=$2b$12$XYZ123...
-JWT_SECRET=abc123def456...
 GROQ_API_KEY=[Get new key from https://console.groq.com/keys]
 ```
 
@@ -167,20 +166,19 @@ GROQ_API_KEY=[Get new key from https://console.groq.com/keys]
 1. **Navigate**: Site Dashboard → Site settings → Environment variables
 2. **Add variables** one by one:
 
-| Variable Name         | Example Value     | Description                |
-| --------------------- | ----------------- | -------------------------- |
-| `ADMIN_USERNAME`      | `administroni`    | Admin login username       |
-| `ADMIN_PASSWORD_HASH` | `$2b$12$XYZ...`   | Bcrypt hash from generator |
-| `JWT_SECRET`          | `abc123def456...` | JWT signing secret         |
-| `GROQ_API_KEY`        | `gsk_xyz123...`   | Groq AI API key            |
-| `NODE_VERSION`        | `18`              | Node.js version            |
-| `PYTHON_VERSION`      | `3.11`            | Python version             |
+| Variable Name         | Example Value   | Description                |
+| --------------------- | --------------- | -------------------------- |
+| `ADMIN_USERNAME`      | `administroni`  | Admin login username       |
+| `ADMIN_PASSWORD_HASH` | `$2b$12$XYZ...` | Bcrypt hash from generator |
+| `GROQ_API_KEY`        | `gsk_xyz123...` | Groq AI API key            |
+| `NODE_VERSION`        | `18`            | Node.js version            |
+| `PYTHON_VERSION`      | `3.11`          | Python version             |
 
 ### 4.2 Security Notes
 
 - ⚠️ **NEVER** commit these values to Git
 - 🔒 Store them only in Netlify environment variables
-- 🔄 Rotate JWT_SECRET and GROQ_API_KEY regularly
+- 🔄 Rotate GROQ_API_KEY regularly
 - 📝 Keep a secure backup of ADMIN_PASSWORD_HASH
 
 ---
@@ -305,7 +303,7 @@ curl https://kosge-berlin.de/api/banners
 - [ ] Netlify Identity set to "invite only"
 - [ ] GitHub token has minimal required permissions
 - [ ] GROQ API key is fresh and secure
-- [ ] JWT secret is cryptographically strong
+- [ ] Admin authentication uses bcrypt password hashing
 - [ ] Admin password is strong (8+ characters)
 - [ ] SSL certificate is active
 - [ ] No secrets committed to Git
@@ -331,7 +329,7 @@ curl https://kosge-berlin.de/api/banners
 ### 9.1 Regular Maintenance
 
 - **Monthly**: Review function logs for errors
-- **Quarterly**: Rotate JWT_SECRET and GROQ_API_KEY
+- **Quarterly**: Rotate GROQ_API_KEY
 - **Annually**: Review and update admin access
 
 ### 9.2 Content Updates
