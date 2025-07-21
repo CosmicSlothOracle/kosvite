@@ -14,6 +14,22 @@
     <link rel="stylesheet" href="css/visual-enhancements.css" />
     <!-- Translation Library -->
     <script src="https://cdn.jsdelivr.net/npm/i18next@21.6.14/i18next.min.js"></script>
+    <!-- Initialize i18next and expose translations object -->
+    <script>
+      i18next.init({
+        lng: 'de',
+        resources: {
+          de: { translation: {} },
+          en: { translation: {} },
+          tr: { translation: {} },
+          ru: { translation: {} },
+          ar: { translation: {} }
+        }
+      }).then(() => {
+        // Expose to legacy code that expects a global `translations` object
+        window.translations = i18next.store.data;
+      });
+    </script>
     <style>
         .logo-container {
             position: relative;
@@ -404,6 +420,10 @@
                 </select>
             </div>
         </header>
+        <!-- Hero Slideshow (at least one slide to satisfy JS) -->
+        <div class="hero-slide active">
+            <img src="https://link.storjshare.io/raw/jxwpeplx3yxtkyeltknei6yn5dtq/geko/event0.png" alt="Slide 1" style="width:100%; height:auto; border-radius:12px;" />
+        </div>
         <!-- Desktop Navigation -->
         <nav role="navigation" aria-label="Hauptnavigation">
             <ul class="main-nav">
@@ -1233,7 +1253,7 @@
 
       async function loadHomepageConfig() {
         try {
-          const resp = await fetch('/data/homepage.yml');
+          const resp = await fetch('/public/data/homepage.yml');
           const text = await resp.text();
           const cfg = jsyaml.load(text);
           const imgSrc = cfg.uploadImage || cfg.imageUrl;
@@ -1259,7 +1279,7 @@
     </script>
     <script src="/js/chatbotKey.js"></script>
     <script defer src="/js/chatbot.js"></script>
-    <script src="js/section-icons.js"></script>
+    <!-- <script src="js/section-icons.js"></script> -->
     <script>
     // Load banner images from Netlify Function and update placeholders on the homepage
     async function fetchBannersFromApi() {
