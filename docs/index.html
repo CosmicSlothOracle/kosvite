@@ -270,6 +270,14 @@
             object-fit: cover;
             display: block;
         }
+        /* Banner grid container */
+        .banner-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            justify-content: center;
+            align-items: flex-start;
+        }
 
         /* Smoke animation for modal closing */
         @keyframes smokeEffect {
@@ -491,6 +499,19 @@
                 </div>
                 <img class="section-arrow"
                 src="https://link.storjshare.io/raw/jx4zolve64kgmj27jdwq3fh4otka/geko/arrow.png" alt="Pfeil">
+            </section>
+            <!-- New Banners Section -->
+            <section id="banners">
+                <div class="section-title-container">
+                    <h2 data-translate="banners-title">Unsere Banner</h2>
+                </div>
+                <div id="banners-container" class="banner-grid">
+                    <div class="banner"><img id="banner1" src="https://i.postimg.cc/vTW9F8fC/platzhalter.png" alt="Banner 1"></div>
+                    <div class="banner"><img id="banner2" src="https://i.postimg.cc/vTW9F8fC/platzhalter.png" alt="Banner 2"></div>
+                    <div class="banner"><img id="banner3" src="https://i.postimg.cc/vTW9F8fC/platzhalter.png" alt="Banner 3"></div>
+                    <div class="banner"><img id="banner4" src="https://i.postimg.cc/vTW9F8fC/platzhalter.png" alt="Banner 4"></div>
+                </div>
+                <img class="section-arrow" src="https://link.storjshare.io/raw/jx4zolve64kgmj27jdwq3fh4otka/geko/arrow.png" alt="Pfeil">
             </section>
             <section id="join">
                 <div class="section-title-container">
@@ -1239,6 +1260,24 @@
     <script src="/js/chatbotKey.js"></script>
     <script defer src="/js/chatbot.js"></script>
     <script src="js/section-icons.js"></script>
+    <script>
+    // Load banner images from Netlify Function and update placeholders on the homepage
+    async function fetchBannersFromApi() {
+        try {
+            const res = await fetch('/api/banners');
+            const data = await res.json();
+            if (data.banners && Array.isArray(data.banners)) {
+                data.banners.slice(0, 4).forEach((url, idx) => {
+                    const img = document.getElementById(`banner${idx + 1}`);
+                    if (img) img.src = url;
+                });
+            }
+        } catch (err) {
+            console.error('Error fetching banners:', err);
+        }
+    }
+    document.addEventListener('DOMContentLoaded', fetchBannersFromApi);
+    </script>
 </body>
 
 </html>
