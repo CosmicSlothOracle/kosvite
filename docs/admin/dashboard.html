@@ -102,13 +102,7 @@
         const headers = options.headers || {};
         headers["Content-Type"] = headers["Content-Type"] || "application/json";
 
-        // Get the current user token from Netlify Identity
-        const user = netlifyIdentity.currentUser();
-        if (user) {
-          const token = await user.jwt();
-          headers["Authorization"] = `Bearer ${token}`;
-        }
-
+        // Netlify automatically adds x-netlify-user header when user is authenticated
         const res = await fetch(`/api${path}`, { ...options, headers });
         const data = await res.json().catch(() => ({}));
         if (!res.ok) throw new Error(data.error || res.statusText);
