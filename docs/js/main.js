@@ -46,6 +46,10 @@ document.addEventListener('DOMContentLoaded', function () {
 // Hero Slideshow functionality
 document.addEventListener('DOMContentLoaded', function () {
     const heroSlides = document.querySelectorAll('.hero-slide');
+    // Exit early if no slides are present to avoid errors
+    if (!heroSlides.length) {
+        return;
+    }
     let currentSlide = 0;
 
     function showSlide(index) {
