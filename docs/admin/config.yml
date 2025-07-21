@@ -2,12 +2,12 @@ backend:
   name: git-gateway
   branch: main
 
-media_folder: "docs/public/uploads"
-public_folder: "/uploads"
+media_folder: "docs/public/uploads/banners"
+public_folder: "/uploads/banners"
 
 collections:
   - name: "imagesConfig"
-    label: "Bilder"
+    label: "Startseiten-Konfiguration"
     files:
       - label: "Startseitenbild"
         name: "homepage"
@@ -21,30 +21,30 @@ collections:
               required: false,
             }
           - {
-              label: "Upload",
+              label: "Upload Bild",
               name: "uploadImage",
               widget: "image",
               required: false,
             }
 
   - name: "banners"
-    label: "Banner"
+    label: "Banner Management"
     folder: "docs/public/uploads/banners"
     create: true
+    slug: "banner-{{year}}-{{month}}-{{day}}-{{hour}}-{{minute}}-{{slug}}"
     fields:
       - { label: "Banner Name", name: "name", widget: "string" }
-      - { label: "Banner Image", name: "image", widget: "image" }
-      - { label: "Active", name: "active", widget: "boolean", default: true }
-      - { label: "Display Order", name: "order", widget: "number", default: 1 }
-
-  - name: "participants"
-    label: "Teilnehmer"
-    files:
-      - label: "Teilnehmer Daten"
-        name: "participants"
-        file: "participants.json"
-        fields:
-          - { label: "Name", name: "name", widget: "string" }
-          - { label: "Email", name: "email", widget: "string" }
-          - { label: "Message", name: "message", widget: "text" }
-          - { label: "Timestamp", name: "timestamp", widget: "datetime" }
+      - { label: "Banner Bild", name: "image", widget: "image" }
+      - { label: "Aktiv", name: "active", widget: "boolean", default: true }
+      - {
+          label: "Anzeige Reihenfolge",
+          name: "order",
+          widget: "number",
+          default: 1,
+        }
+      - {
+          label: "Beschreibung",
+          name: "description",
+          widget: "text",
+          required: false,
+        }
