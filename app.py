@@ -21,11 +21,12 @@ CORS(app, resources={
         "origins": [
             "http://localhost:8000",
             "http://localhost:8080",
+            "https://kosge-berlin.de",
+            "https://www.kosge-berlin.de",
             "https://kosge-frontend.onrender.com",
             "https://kosge-frontend-kqxo.onrender.com",
-            "https://kos-frontend.onrender.com",
-            "https://kos-frontend-kqxo.onrender.com",
-            "https://kos-2.onrender.com"
+            "https://kosge-berlin.de",
+            "https://www.kosge-berlin.de"
         ],
         "methods": ["GET", "POST", "DELETE", "OPTIONS", "PUT"],
         "allow_headers": ["Content-Type", "Authorization"],
@@ -426,7 +427,7 @@ def index():
     # Check if this is a browser request (has Accept header with text/html)
     if 'text/html' in request.headers.get('Accept', ''):
         # Redirect to frontend
-        return redirect('https://kosge-frontend.onrender.com')
+        return redirect('https://kosge-berlin.de')
     # Otherwise return API status as JSON
     return jsonify({
         'status': 'online',
