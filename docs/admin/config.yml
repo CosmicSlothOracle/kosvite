@@ -26,3 +26,25 @@ collections:
               widget: "image",
               required: false,
             }
+
+  - name: "banners"
+    label: "Banner"
+    folder: "docs/public/uploads/banners"
+    create: true
+    fields:
+      - { label: "Banner Name", name: "name", widget: "string" }
+      - { label: "Banner Image", name: "image", widget: "image" }
+      - { label: "Active", name: "active", widget: "boolean", default: true }
+      - { label: "Display Order", name: "order", widget: "number", default: 1 }
+
+  - name: "participants"
+    label: "Teilnehmer"
+    files:
+      - label: "Teilnehmer Daten"
+        name: "participants"
+        file: "participants.json"
+        fields:
+          - { label: "Name", name: "name", widget: "string" }
+          - { label: "Email", name: "email", widget: "string" }
+          - { label: "Message", name: "message", widget: "text" }
+          - { label: "Timestamp", name: "timestamp", widget: "datetime" }

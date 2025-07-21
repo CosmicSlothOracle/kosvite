@@ -1,43 +1,110 @@
-const { getStore, authRequired, jsonResponse } = require("./common");
-const { v4: uuidv4 } = require("uuid");
+const { getStore } = require("./common");
+const jwt = require("jsonwebtoken");
 
-const store = getStore("participants", { consistency: "strong" });
-
-async function addParticipant(event) {
-  let data;
+// Verify Netlify Identity JWT token
+function verifyNetlifyToken(token) {
   try {
-    data = JSON.parse(event.body || "{}");
-  } catch {
-    return jsonResponse({ error: "Invalid JSON" }, 400);
+    // Netlify Identity uses RS256 algorithm
+    const decoded = jwt.verify(token, process.env.NETLIFY_JWT_SECRET, { algorithms: ['RS256'] });
+    return decoded;
+  } catch (error) {
+    return null;
   }
-  const { name, email, message, banner } = data;
-  if (!name) return jsonResponse({ error: "Name is required" }, 400);
-  const id = uuidv4();
-  const participant = { id, name, email, message, banner, timestamp: new Date().toISOString() };
-  await store.setJSON(id, participant);
-  return jsonResponse({ success: true, participant }, 201);
 }
 
-async function listParticipants() {
-  const all = [];
-  for await (const page of store.list({ paginate: true })) {
-    for (const blob of page.blobs) {
-      const data = await store.get(blob.key, { type: "json", consistency: "strong" });
-      if (data) all.push(data);
+exports.handler = async (event) => {
+  // Check if user is authenticated via Netlify Identity
+  const authHeader = event.headers["authorization"] || event.headers["Authorization"];
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return {
+      statusCode: 401,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ error: "Authentication required" })
+    };
+  }
+
+  const token = authHeader.replace("Bearer ", "");
+  const user = verifyNetlifyToken(token);
+
+  if (!user) {
+    return {
+      statusCode: 401,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ error: "Invalid token" })
+    };
+  }
+
+  const store = getStore("participants");
+
+  if (event.httpMethod === "GET") {
+    try {
+      const participants = await store.list();
+      const participantData = [];
+
+      for await (const page of participants) {
+        for (const blob of page.blobs) {
+          const data = await store.get(blob.key);
+          if (data) {
+            participantData.push(JSON.parse(data.toString()));
+          }
+        }
+      }
+
+      return {
+        statusCode: 200,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ participants: participantData })
+      };
+    } catch (error) {
+      return {
+        statusCode: 500,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ error: "Failed to load participants" })
+      };
     }
   }
-  // Sort newest first
-  all.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-  return jsonResponse({ participants: all });
-}
 
-exports.handler = async (event, context) => {
   if (event.httpMethod === "POST") {
-    return addParticipant(event);
+    try {
+      const body = JSON.parse(event.body);
+      const { name, email, message } = body;
+
+      if (!name) {
+        return {
+          statusCode: 400,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ error: "Name is required" })
+        };
+      }
+
+      const participant = {
+        name,
+        email: email || "",
+        message: message || "",
+        timestamp: new Date().toISOString()
+      };
+
+      const key = `participant_${Date.now()}_${name.replace(/[^a-zA-Z0-9]/g, '_')}`;
+
+      await store.set(key, JSON.stringify(participant));
+
+      return {
+        statusCode: 200,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: "Participant added successfully" })
+      };
+    } catch (error) {
+      return {
+        statusCode: 500,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ error: "Failed to add participant" })
+      };
+    }
   }
-  if (event.httpMethod === "GET") {
-    // protect GET with auth
-    return authRequired(() => listParticipants())(event, context);
-  }
-  return { statusCode: 405, body: "Method Not Allowed" };
+
+  return {
+    statusCode: 405,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ error: "Method not allowed" })
+  };
 };
