@@ -1,22 +1,20 @@
 const { getStore } = require("./common");
 
 exports.handler = async (event, context) => {
-  // Netlify automatically verifies the Identity JWT and provides the user info
-  const identity = context.clientContext && context.clientContext.identity;
-
-  if (!identity || !identity.url) {
-    return {
-      statusCode: 401,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ error: "Authentication required" })
-    };
-  }
-
-  const user = identity; // identity contains user metadata such as email
-
   const store = getStore("participants");
 
   if (event.httpMethod === "GET") {
+    // GET-Requests erfordern Authentifizierung (Admin-Funktionen)
+    const identity = context.clientContext && context.clientContext.identity;
+
+    if (!identity || !identity.url) {
+      return {
+        statusCode: 401,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ error: "Authentication required" })
+      };
+    }
+
     try {
       const participants = await store.list();
       const participantData = [];
@@ -45,9 +43,10 @@ exports.handler = async (event, context) => {
   }
 
   if (event.httpMethod === "POST") {
+    // POST-Requests sind öffentlich zugänglich (Banner-Teilnahmen)
     try {
       const body = JSON.parse(event.body);
-      const { name, email, message } = body;
+      const { name, email, message, banner } = body; // Banner-Feld hinzugefügt
 
       if (!name) {
         return {
@@ -61,8 +60,9 @@ exports.handler = async (event, context) => {
         name,
         email: email || "",
         message: message || "",
+        banner: banner || "", // Banner-Feld hinzugefügt
         timestamp: new Date().toISOString(),
-        addedBy: user.email || user.sub || "unknown"
+        addedBy: "public" // Für öffentliche Teilnahmen
       };
 
       const key = `participant_${Date.now()}_${name.replace(/[^a-zA-Z0-9]/g, '_')}`;
@@ -75,6 +75,7 @@ exports.handler = async (event, context) => {
         body: JSON.stringify({ message: "Participant added successfully" })
       };
     } catch (error) {
+      console.error('Error in POST /api/participants:', error);
       return {
         statusCode: 500,
         headers: { "Content-Type": "application/json" },
