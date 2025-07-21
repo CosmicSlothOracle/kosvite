@@ -249,6 +249,11 @@
           userInfo.textContent = "";
         });
       }
+
+      // Initialize Netlify Identity when script loads
+      if (window.netlifyIdentity) {
+        netlifyIdentity.init();
+      }
     })();
   </script>
 </body>

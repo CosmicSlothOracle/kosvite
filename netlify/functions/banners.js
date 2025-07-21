@@ -1,21 +1,10 @@
 const { getStore } = require("./common");
-const jwt = require("jsonwebtoken");
 
-// Verify Netlify Identity JWT token
-function verifyNetlifyToken(token) {
-  try {
-    // Netlify Identity uses RS256 algorithm
-    const decoded = jwt.verify(token, process.env.NETLIFY_JWT_SECRET, { algorithms: ['RS256'] });
-    return decoded;
-  } catch (error) {
-    return null;
-  }
-}
+exports.handler = async (event, context) => {
+  // Netlify provides verified Identity details via `context.clientContext.identity`
+  const identity = context.clientContext && context.clientContext.identity;
 
-exports.handler = async (event) => {
-  // Check if user is authenticated via Netlify Identity
-  const authHeader = event.headers["authorization"] || event.headers["Authorization"];
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+  if (!identity) {
     return {
       statusCode: 401,
       headers: { "Content-Type": "application/json" },
@@ -23,16 +12,7 @@ exports.handler = async (event) => {
     };
   }
 
-  const token = authHeader.replace("Bearer ", "");
-  const user = verifyNetlifyToken(token);
-
-  if (!user) {
-    return {
-      statusCode: 401,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ error: "Invalid token" })
-    };
-  }
+  const user = identity; // contains email and other metadata
 
   const store = getStore("banners");
 
@@ -70,7 +50,7 @@ exports.handler = async (event) => {
       const key = `banner_${Date.now()}_${filename}`;
 
       await store.set(key, buffer, {
-        metadata: { filename, uploadedBy: user.email, uploadedAt: new Date().toISOString() }
+        metadata: { filename, uploadedBy: user.email || user.sub || "unknown", uploadedAt: new Date().toISOString() }
       });
 
       return {

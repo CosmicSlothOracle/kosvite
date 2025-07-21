@@ -7,10 +7,6 @@
   node_bundler = "esbuild"
 
 [[redirects]]
-  from = "/api/login"
-  to = "/.netlify/functions/login"
-  status = 200
-[[redirects]]
   from = "/api/participants"
   to = "/.netlify/functions/participants"
   status = 200
@@ -22,6 +18,11 @@
 [[redirects]]
   from = "/api/banners"
   to = "/.netlify/functions/banners"
+  status = 200
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
   status = 200
 
 # Keep SPA redirect last

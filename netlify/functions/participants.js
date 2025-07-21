@@ -1,21 +1,10 @@
 const { getStore } = require("./common");
-const jwt = require("jsonwebtoken");
 
-// Verify Netlify Identity JWT token
-function verifyNetlifyToken(token) {
-  try {
-    // Netlify Identity uses RS256 algorithm
-    const decoded = jwt.verify(token, process.env.NETLIFY_JWT_SECRET, { algorithms: ['RS256'] });
-    return decoded;
-  } catch (error) {
-    return null;
-  }
-}
+exports.handler = async (event, context) => {
+  // Netlify automatically verifies the Identity JWT and provides the user info
+  const identity = context.clientContext && context.clientContext.identity;
 
-exports.handler = async (event) => {
-  // Check if user is authenticated via Netlify Identity
-  const authHeader = event.headers["authorization"] || event.headers["Authorization"];
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+  if (!identity || !identity.url) {
     return {
       statusCode: 401,
       headers: { "Content-Type": "application/json" },
@@ -23,16 +12,7 @@ exports.handler = async (event) => {
     };
   }
 
-  const token = authHeader.replace("Bearer ", "");
-  const user = verifyNetlifyToken(token);
-
-  if (!user) {
-    return {
-      statusCode: 401,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ error: "Invalid token" })
-    };
-  }
+  const user = identity; // identity contains user metadata such as email
 
   const store = getStore("participants");
 
@@ -81,7 +61,8 @@ exports.handler = async (event) => {
         name,
         email: email || "",
         message: message || "",
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        addedBy: user.email || user.sub || "unknown"
       };
 
       const key = `participant_${Date.now()}_${name.replace(/[^a-zA-Z0-9]/g, '_')}`;
