@@ -573,26 +573,6 @@
             </div>
         </footer>
     </div>
-    <!-- Admin Login Button -->
-    <a id="admin-login-button" href="/admin.html" class="admin-link">Admin Panel</a>
-    <!-- Admin Login Modal -->
-    <div id="admin-login-modal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Admin Login</h2>
-            <form id="admin-login-form">
-                <div class="form-group">
-                    <label for="username">Benutzername:</label>
-                    <input type="text" id="username" name="username" required>
-                </div>
-                <div class="form-group">
-                    <label for="password">Passwort:</label>
-                    <input type="password" id="password" name="password" required>
-                </div>
-                <button type="submit">Anmelden</button>
-            </form>
-        </div>
-    </div>
     <!-- Banner Edit Modal -->
     <div id="banner-edit-modal" class="modal">
         <div class="modal-content">
@@ -728,174 +708,6 @@
 
             // Change slide every 6 seconds
             setInterval(nextSlide, 6000);
-        });
-    </script>
-    <!-- Admin Login and Banner Management -->
-    <script>
-        // Admin Login and Banner Management
-        const ADMIN_USERNAME = 'admin';
-        const ADMIN_PASSWORD = 'kosge2024!';
-        let isAdminLoggedIn = false;
-
-        // Admin Login Modal
-        const adminLoginModal = document.getElementById('admin-login-modal');
-        const bannerEditModal = document.getElementById('banner-edit-modal');
-        const adminLoginForm = document.getElementById('admin-login-form');
-        const bannerEditForm = document.getElementById('banner-edit-form');
-        const editBannerBtns = document.querySelectorAll('.edit-banner-btn');
-        const closeButtons = document.querySelectorAll('.close');
-
-        // Close modal functions
-        closeButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                btn.closest('.modal').style.display = 'none';
-            });
-        });
-
-        // Füge einen Dashboard-Button hinzu (zunächst versteckt)
-        const dashboardBtn = document.createElement('button');
-        dashboardBtn.id = 'dashboard-btn';
-        dashboardBtn.textContent = 'Zum Dashboard';
-        dashboardBtn.style.position = 'fixed';
-        dashboardBtn.style.top = '20px';
-        dashboardBtn.style.right = '160px';
-        dashboardBtn.style.padding = '10px 20px';
-        dashboardBtn.style.backgroundColor = 'var(--secondary-color)';
-        dashboardBtn.style.color = 'white';
-        dashboardBtn.style.border = 'none';
-        dashboardBtn.style.borderRadius = '5px';
-        dashboardBtn.style.cursor = 'pointer';
-        dashboardBtn.style.zIndex = '1001';
-        dashboardBtn.style.fontSize = '16px';
-        dashboardBtn.style.display = 'none';
-        dashboardBtn.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
-        dashboardBtn.addEventListener('click', () => {
-            window.open('admin/dashboard.html', '_blank');
-        });
-        document.body.appendChild(dashboardBtn);
-
-        // Admin Login
-        adminLoginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-
-            if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-                isAdminLoggedIn = true;
-                adminLoginModal.style.display = 'none';
-                // Automatically redirect to dashboard instead of showing dashboard button
-                window.location.href = 'admin/dashboard.html';
-            } else {
-                alert('Ungültige Anmeldedaten');
-            }
-        });
-
-        // Ensure edit buttons are hidden by default
-        document.addEventListener('DOMContentLoaded', () => {
-            editBannerBtns.forEach(btn => {
-                btn.style.display = 'none';
-                btn.style.visibility = 'hidden';
-                btn.style.opacity = '0';
-            });
-
-            // Load saved banner URLs on page load
-            loadBanners();
-        });
-
-        // Banner Edit Functionality
-        editBannerBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                if (!isAdminLoggedIn) {
-                    adminLoginModal.style.display = 'block';
-                    return;
-                }
-                const bannerId = btn.getAttribute('data-banner');
-                document.getElementById('edit-banner-id').value = bannerId;
-                const currentUrl = document.getElementById(`banner${bannerId}`).src;
-                if (currentUrl !== 'https://i.postimg.cc/vTW9F8fC/platzhalter.png') {
-                    document.getElementById('banner-url').value = currentUrl;
-                }
-                bannerEditModal.style.display = 'block';
-            });
-        });
-
-        // Banner Edit Form Submit
-        bannerEditForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const bannerId = document.getElementById('edit-banner-id').value;
-            const bannerUrl = document.getElementById('banner-url').value;
-
-            // Validate URL
-            const isValidUrl = (url) => {
-                try {
-                    new URL(url);
-                    return url.match(/\.(jpeg|jpg|gif|png)$/i) != null;
-                } catch (e) {
-                    return false;
-                }
-            };
-
-            if (!isValidUrl(bannerUrl)) {
-                document.getElementById('banner-edit-message').textContent = 'Bitte geben Sie eine gültige Bild-URL ein (PNG, JPG, JPEG, GIF)';
-                document.getElementById('banner-edit-message').style.color = 'red';
-                return;
-            }
-
-            // Save to localStorage
-            localStorage.setItem(`banner${bannerId}Url`, bannerUrl);
-
-            // Update banner image
-            document.getElementById(`banner${bannerId}`).src = bannerUrl;
-
-            // Close modal
-            bannerEditModal.style.display = 'none';
-            document.getElementById('banner-edit-message').textContent = '';
-            document.getElementById('banner-url').value = '';
-        });
-
-        // Load saved banner URLs on page load
-        function loadBanners() {
-            console.log("loadBanners function called");
-
-            for (let i = 1; i <= 4; i++) {
-                const savedUrl = localStorage.getItem(`banner${i}Url`);
-                const bannerImg = document.getElementById(`banner${i}`);
-
-                console.log(`Banner ${i}:`, {
-                    "savedUrl": savedUrl,
-                    "bannerElement": bannerImg,
-                    "bannerElementExists": !!bannerImg
-                });
-
-                if (savedUrl && bannerImg) {
-                    console.log(`Setting banner ${i} src to`, savedUrl);
-                    bannerImg.src = savedUrl;
-
-                    // Add error handling for broken image URLs
-                    bannerImg.onerror = function() {
-                        console.log(`Error loading image for banner ${i}, using placeholder`);
-                        this.src = 'https://i.postimg.cc/vTW9F8fC/platzhalter.png';
-                        this.onerror = null; // Prevent infinite loop
-                    };
-
-                    // Ensure onload event fires
-                    bannerImg.onload = function() {
-                        console.log(`Banner ${i} image loaded successfully`);
-                    };
-                }
-            }
-        }
-
-        // Ensure banners load on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            loadBanners();
-            console.log("Banners loaded on DOMContentLoaded");
-        });
-
-        // Additionally load banners when window is fully loaded
-        window.addEventListener('load', function() {
-            loadBanners();
-            console.log("Banners loaded on window load");
         });
     </script>
     <!-- Add translations for banners -->
@@ -1064,10 +876,11 @@
 
         // Admin Teilnahmen anzeigen
         async function showParticipations() {
-            if (!isAdminLoggedIn) {
-                adminLoginModal.style.display = 'block';
-                return;
-            }
+            // Removed admin login check as admin login button is removed
+            // if (!isAdminLoggedIn) {
+            //     adminLoginModal.style.display = 'block';
+            //     return;
+            // }
 
             try {
                 participationList.innerHTML = '<div class="loading-message">Lade Teilnahmen...</div>';
@@ -1245,6 +1058,8 @@
         window.netlifyIdentity.on("logout", () => {
           document.location.href = "/";
         });
+        // Start Netlify Identity after listeners are in place
+        window.netlifyIdentity.init();
       }
 
       async function loadHomepageConfig() {
