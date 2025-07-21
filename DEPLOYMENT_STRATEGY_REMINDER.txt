@@ -1,0 +1,61 @@
+🚀 KOSGE BERLIN PROJECT - DEPLOYMENT STRATEGY REMINDER
+================================================================
+
+⚠️  CRITICAL: READ THIS BEFORE ANY DEPLOYMENT CHANGES ⚠️
+
+CURRENT DEPLOYMENT SETUP:
+========================
+✅ NETLIFY DEPLOYMENT (PRIMARY & CORRECT)
+- Repository: https://github.com/CosmicSlothOracle/kosvite.git
+- Platform: Netlify (NOT GitHub Pages)
+- Config File: netlify.toml
+- Build Command: npm --prefix netlify/functions install && python scripts/generate_chatbot_key.py && python scripts/inject_chatbot_script.py
+- Publish Directory: docs/
+- Functions Directory: netlify/functions/
+
+NETLIFY FEATURES IN USE:
+=======================
+✅ Netlify Functions (Essential for backend)
+   - /api/login → /.netlify/functions/login
+   - /api/participants → /.netlify/functions/participants
+   - /api/banners → /.netlify/functions/banners
+
+✅ Netlify Identity (Authentication system)
+
+✅ Server-side Redirects
+   - SPA routing: /* → /index.html
+   - API routing to functions
+
+WHAT TO AVOID:
+=============
+❌ GitHub Pages deployment
+❌ Any .github/workflows/static.yml or similar GitHub Actions
+❌ Changing deployment platform without full migration
+❌ Conflicting deployment configurations
+
+KNOWN ISSUES TO FIX:
+==================
+🔧 .github/workflows/static.yml
+   - This file CONFLICTS with Netlify deployment
+   - It's configured for GitHub Pages (wrong platform)
+   - Should be DELETED to avoid deployment conflicts
+   - GitHub Pages cannot handle Netlify Functions or Identity
+
+DEPLOYMENT FLOW:
+===============
+1. Code changes pushed to main branch
+2. Netlify automatically detects changes
+3. Netlify runs build command from netlify.toml
+4. Netlify deploys to production
+5. Functions and Identity work seamlessly
+
+REMEMBER:
+=========
+- Always deploy via Netlify (never GitHub Pages)
+- Backend functionality requires Netlify Functions
+- Authentication requires Netlify Identity
+- Keep netlify.toml as the single source of truth
+- Remove any conflicting GitHub Actions workflows
+
+Last Updated: 2025-01-27
+Project Lead: Based on memory - direct deploy to main, Netlify functions preferred
