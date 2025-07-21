@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "type": "commonjs",
   "dependencies": {
-    "@netlify/blobs": "^10.0.5"
+    "@netlify/blobs": "^10.0.5",
+    "jsonwebtoken": "^9.0.2"
   }
 }

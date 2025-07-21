@@ -1,13 +1,36 @@
 const { getStore } = require("./common");
+const jwt = require("jsonwebtoken");
+
+// Verify Netlify Identity JWT token
+function verifyNetlifyToken(token) {
+  try {
+    // Netlify Identity uses RS256 algorithm
+    const decoded = jwt.verify(token, process.env.NETLIFY_JWT_SECRET, { algorithms: ['RS256'] });
+    return decoded;
+  } catch (error) {
+    return null;
+  }
+}
 
 exports.handler = async (event) => {
   // Check if user is authenticated via Netlify Identity
-  const user = event.headers["x-netlify-user"];
-  if (!user) {
+  const authHeader = event.headers["authorization"] || event.headers["Authorization"];
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return {
       statusCode: 401,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ error: "Authentication required" })
+    };
+  }
+
+  const token = authHeader.replace("Bearer ", "");
+  const user = verifyNetlifyToken(token);
+
+  if (!user) {
+    return {
+      statusCode: 401,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ error: "Invalid token" })
     };
   }
 
@@ -47,7 +70,7 @@ exports.handler = async (event) => {
       const key = `banner_${Date.now()}_${filename}`;
 
       await store.set(key, buffer, {
-        metadata: { filename, uploadedBy: user, uploadedAt: new Date().toISOString() }
+        metadata: { filename, uploadedBy: user.email, uploadedAt: new Date().toISOString() }
       });
 
       return {

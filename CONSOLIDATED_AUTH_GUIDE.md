@@ -24,9 +24,8 @@ The project has been successfully consolidated to use **only Netlify Identity** 
 
 - ✅ Updated `netlify/functions/banners.js` to use Netlify Identity
 - ✅ Updated `netlify/functions/participants.js` to use Netlify Identity
-- ✅ Removed JWT/bcrypt dependencies (no custom JWT verification needed)
+- ✅ Removed JWT/bcrypt dependencies (kept jsonwebtoken for token verification)
 - ✅ Simplified `netlify/functions/common.js`
-- ✅ Using `x-netlify-user` header for authentication
 
 ### **4. New Admin Dashboard**
 
@@ -47,7 +46,7 @@ const ADMIN_PASSWORD = "kosge2024!";
 
 - ✅ **Netlify Identity**: Email invitation → User creates password
 - ✅ **No hardcoded credentials**: All authentication via Netlify
-- ✅ **Built-in authentication**: Using `x-netlify-user` header
+- ✅ **JWT token verification**: Proper token validation
 - ✅ **Single login system**: One authentication method
 
 ## 📋 **Admin Access:**
@@ -77,13 +76,18 @@ const ADMIN_PASSWORD = "kosge2024!";
 
 ### **1. Environment Variables**
 
-**No environment variables needed!** Netlify Identity handles authentication automatically.
+Set these in your Netlify Dashboard:
+
+```bash
+NETLIFY_JWT_SECRET=[Get from Netlify Identity settings]
+```
 
 ### **2. Netlify Identity Setup**
 
 1. Go to Netlify Dashboard → Site Settings → Identity
 2. Enable Identity service
 3. Configure registration (invite-only recommended)
+4. Get the JWT secret from Identity settings
 
 ### **3. Invite Admin Users**
 
@@ -112,10 +116,9 @@ const ADMIN_PASSWORD = "kosge2024!";
 3. **📧 Email Invitations**: Secure user onboarding
 4. **🔄 Unified Interface**: All admin functions in Netlify CMS
 5. **🚀 Simplified Maintenance**: Fewer authentication systems to manage
-6. **💰 Free Plan Compatible**: Works with Netlify's free Starter plan
 
 ## 🎉 **Result:**
 
-The project now has a **single, secure authentication system** using Netlify Identity with built-in authentication. All admin functions are accessible through the same login, eliminating the security risk of hardcoded credentials while providing a better user experience.
+The project now has a **single, secure authentication system** using Netlify Identity. All admin functions are accessible through the same login, eliminating the security risk of hardcoded credentials while providing a better user experience.
 
 **Status**: ✅ **CONSOLIDATION COMPLETE**
